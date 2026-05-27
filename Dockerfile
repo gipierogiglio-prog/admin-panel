@@ -13,4 +13,5 @@ COPY backend/server.js .
 COPY --from=frontend /app/dist frontend/dist
 EXPOSE 3001
 ENV PORT=3001
+RUN mkdir -p /data
 CMD ["node", "server.js"]
