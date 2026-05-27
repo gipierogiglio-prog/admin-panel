@@ -44,14 +44,6 @@ app.get('/api/domains', async (req, res) => {
       proxied: r.proxied,
       ttl: r.ttl,
       zone: 'devgiglio.uk'
-    })
-      id: r.id,
-      name: r.name,
-      type: r.type,
-      content: r.content,
-      proxied: r.proxied,
-      ttl: r.ttl,
-      zone: 'devgiglio.uk'
     }));
 
     // Add known domains not in this zone
