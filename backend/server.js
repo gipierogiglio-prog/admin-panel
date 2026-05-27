@@ -37,11 +37,12 @@ http.createServer((req, res) => {
   serveStatic(req.url, res);
 }).listen(process.env.PORT || 3001, '0.0.0.0', () => console.log('[DASH] OK'));
 
+const https = require("https");
 function httpsGet(url) {
   return new Promise((resolve, reject) => {
     if (!CF_TOKEN) return resolve({ result: [] });
     const u = new URL(url);
     const opts = { hostname: u.hostname, path: u.pathname + u.search, headers: { 'Authorization': `Bearer ${CF_TOKEN}` } };
-    http.get(opts, (res) => { let d=''; res.on('data',c=>d+=c); res.on('end',()=>{ try{ resolve(JSON.parse(d)); }catch(e){ reject(e); } }); }).on('error', reject);
+    https.get(opts, (res) => { let d=''; res.on('data',c=>d+=c); res.on('end',()=>{ try{ resolve(JSON.parse(d)); }catch(e){ reject(e); } }); }).on('error', reject);
   });
 }
