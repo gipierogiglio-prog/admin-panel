@@ -3,24 +3,36 @@ const cors = require('cors');
 const path = require('path');
 const https = require('https');
 
+// Prevent crash on unhandled errors
+process.on('unhandledRejection', (err) => {
+  console.log('[DASH] Unhandled rejection:', err.message);
+});
+process.on('uncaughtException', (err) => {
+  console.log('[DASH] Uncaught exception:', err.message);
+});
+
 const app = express();
 
 console.log('[DASH] Access Dashboard iniciando...');
 console.log('[DASH] Porta:', process.env.PORT || 3001);
 console.log('[DASH] CF_TOKEN configurado?', process.env.CF_TOKEN ? 'SIM' : 'NAO - API Cloudflare nao vai funcionar');
-console.log('[DASH] Zona UK: 8c5417878f88d14a648711efd68b56e4');
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'frontend/dist')));
 console.log('[DASH] Servindo estaticos de:', path.join(__dirname, 'frontend/dist'));
 
-const CF_TOKEN = process.env.CF_TOKEN ;
+const CF_TOKEN = process.env.CF_TOKEN || '';
 const ZONE_UK = '8c5417878f88d14a648711efd68b56e4';
 const API = 'https://api.cloudflare.com/client/v4';
 
 // Helper to call Cloudflare API
 function cf(path) {
   console.log('[CF] Chamando:', path);
+  if (!CF_TOKEN) {
+    console.log('[CF] ERRO: CF_TOKEN nao configurado');
+    return Promise.resolve({ result: [] });
+  }
   return new Promise((resolve, reject) => {
     https.get(`${API}${path}`, { headers: { 'Authorization': `Bearer ${CF_TOKEN}`, 'Content-Type': 'application/json' } }, (res) => {
       let data = '';
@@ -94,9 +106,10 @@ app.post('/api/domains/:id/toggle', async (req, res) => {
 
     res.json({ success: update.success, proxied: update.result?.proxied });
   } catch(e) {
+    console.log('[API] ERRO toggle:', e.message);
     res.status(500).json({ error: e.message });
   }
 });
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, '0.0.0.0', () => console.log(`Access Dashboard API: http://0.0.0.0:${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log('[DASH] Servidor rodando em http://0.0.0.0:' + PORT));
