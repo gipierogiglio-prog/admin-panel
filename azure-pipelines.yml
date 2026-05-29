@@ -6,6 +6,8 @@ trigger:
 variables:
   - group: devgiglio-env
   - group: devgiglio-secrets
+  - name: APP_NAME
+    value: admin-panel
 
 pool: ubuntu-latest
 steps:
@@ -28,5 +30,6 @@ steps:
       sshEndpoint: devgiglio-vps-ssh
       runOptions: commands
       commands: |
+        cd /opt/devgiglio
         docker pull ghcr.io/gipierogiglio-prog/admin-panel:latest
-        docker service update --image ghcr.io/gipierogiglio-prog/admin-panel:latest app-input-back-end-microchip-9fdpbz
+        docker compose up -d --force-recreate admin-panel
