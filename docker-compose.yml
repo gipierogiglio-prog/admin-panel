@@ -1,12 +1,17 @@
-services:
-  access-panel:
-    build: .
-    container_name: access-panel
-    restart: unless-stopped
-    ports:
-      - "3001:3001"
-    volumes:
-      - access_config:/data
+name: devgiglio-admin-panel
 
-volumes:
-  access_config:
+services:
+  admin-panel:
+    image: ghcr.io/gipierogiglio-prog/admin-panel:latest
+    container_name: devgiglio-admin-panel
+    restart: always
+    ports:
+      - "5001:5001"
+    networks:
+      - devgiglio-network
+    environment:
+      - PORT=5001
+
+networks:
+  devgiglio-network:
+    external: true
